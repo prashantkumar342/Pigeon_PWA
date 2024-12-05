@@ -1,12 +1,12 @@
 
 import { Avatar, Button, Drawer, Divider, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import { Chat, Logout,  Search } from "@mui/icons-material";
-import { setIsDrawer, setIsPeoples } from "../../redux/slices/global/globalSlice";
+import { Chat, Logout, Search } from "@mui/icons-material";
+import { setIsDrawer } from "../../redux/slices/global/globalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/api/logoutSlice"
 import { setUserData, setLoggedIn, } from "../../redux/slices/global/userSlice"
 import { authenticateUser } from "../../redux/slices/api/authenticateSlice"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 function NavDrawer() {
@@ -19,9 +19,9 @@ function NavDrawer() {
       .then(response => {
         const status = response.payload
         if (status === 200) {
+          dispatch(authenticateUser())
           dispatch(setUserData(null))
           dispatch(setLoggedIn(false))
-          dispatch(authenticateUser())
           navigate('/')
         }
       })
@@ -32,7 +32,7 @@ function NavDrawer() {
       onClose={() => dispatch(setIsDrawer(false))}
       sx={{
         '& .MuiDrawer-paper': {
-          width: "200px",
+          width: "230px",
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -51,16 +51,36 @@ function NavDrawer() {
       <div className='w-full flex justify-center h-full items-center'>
         <List>
 
-          <ListItem button sx={{ cursor: "pointer", color: "white" }}>
-            <ListItemIcon sx={{ color: "white" }}><Chat /></ListItemIcon>
-            <ListItemText primary="Chats" sx={{ color: "white" }} />
-          </ListItem>
-          <Divider sx={{ backgroundColor: "white" }} />
-          <ListItem button sx={{ cursor: "pointer", color: "white" }}
-            onClick={() => { dispatch(setIsPeoples(true)); dispatch(setIsDrawer(false)) }}
+          <ListItem sx={{
+            cursor: "pointer",
+          }}
+            component={Link}
+            to="/dashboard/chat"
+            onClick={() => { dispatch(setIsDrawer(false)) }}
           >
-            <ListItemIcon sx={{ color: "white" }}><Search /></ListItemIcon>
-            <ListItemText primary="Search" sx={{ color: "white" }} />
+            <ListItemIcon sx={{
+              color: location.pathname === "/dashboard/chat" ? "white" : "dark",
+            }}><Chat /></ListItemIcon>
+            <ListItemText primary="Chats" sx={{
+              color: location.pathname === "/dashboard/chat" ? "white" : "dark",
+            }} />
+          </ListItem>
+
+          <Divider sx={{ backgroundColor: "white" }} />
+
+          <ListItem sx={{
+            cursor: "pointer",
+          }}
+            component={Link}
+            to="/dashboard/find"
+            onClick={() => { dispatch(setIsDrawer(false)) }}
+          >
+            <ListItemIcon sx={{
+              color: location.pathname === "/dashboard/find" ? "white" : "dark",
+            }}><Search /></ListItemIcon>
+            <ListItemText primary="Search" sx={{
+              color: location.pathname === "/dashboard/find" ? "white" : "dark",
+            }} />
           </ListItem>
         </List>
       </div>

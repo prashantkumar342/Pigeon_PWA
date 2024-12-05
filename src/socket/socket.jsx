@@ -13,9 +13,16 @@ export const SocketProvider = ({ children }) => {
     const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
       transports: ["websocket", "polling"],
     });
+
+    // Add event listeners to handle errors
+    newSocket.on("connect_error", (err) => {
+      console.error("WebSocket connection error:", err);
+    });
+
     setSocket(newSocket);
 
     return () => {
+      // Close socket connection and remove listeners on cleanup
       newSocket.close();
     };
   }, []);

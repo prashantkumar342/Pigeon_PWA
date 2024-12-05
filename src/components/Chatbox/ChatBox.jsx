@@ -109,7 +109,7 @@ function ChatBox() {
           >
             <div
               className={`p-2 max-w-xs ${message.sender === userData._id
-                ? "bg-blue-500 rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl text-white"
+                ? "bg-[#AD49E1] rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl text-white"
                 : "bg-gray-200 rounded-b-2xl rounded-tr-2xl text-black"
                 }`}
             >
