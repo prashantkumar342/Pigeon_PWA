@@ -14,6 +14,7 @@ import NavDrawer from "../Navigation/NavDrawer";
 import { useDispatch, useSelector } from "react-redux";
 import ChatBox from "../Chatbox/ChatBox";
 import { Outlet} from "react-router-dom";
+import InstallButton from "../prompt/InstallButton";
 
 function Dashboard() {
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ function Dashboard() {
                   <Avatar sx={{ marginLeft: "auto" }} src={userData.avatar} />
                 </div>
               )}
+              <InstallButton/>
             </Toolbar>
           </AppBar>
 
