@@ -15,9 +15,8 @@ export default ({ mode }) => {
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: [
-          "index-DUa9jhAc.js",
-          "index-DUfX2OhJ.css",
-          "_redirects",
+          "index-dufx2ohj.css",
+          "index-se4dwbwb.js",
           "index.html",
           "manifest.webmanifest",
           "registerSW.js",
@@ -46,7 +45,7 @@ export default ({ mode }) => {
                   maxAgeSeconds: 60 * 60 * 24, // 1 day
                 },
                 cacheableResponse: {
-                  statuses: [0, 500],
+                  statuses: [0, 200],
                 },
               },
             },
