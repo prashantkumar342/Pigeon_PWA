@@ -1,4 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import registerUserReducer from "./slices/api/registerSlice";
 import authenticateUserReducer from "./slices/api/authenticateSlice";
 import userSliceReducer from "./slices/global/userSlice";
@@ -9,6 +11,12 @@ import recipientReducer from "./slices/api/recipientSlice";
 import conversationReducer from "./slices/api/conversationSlice";
 import messagesReducer from "./slices/api/messagesSlice";
 import { combineReducers } from "redux";
+
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"], // Add other slices you want to persist
+};
 
 const rootReducer = combineReducers({
   registerUser: registerUserReducer,
@@ -22,6 +30,14 @@ const rootReducer = combineReducers({
   messages: messagesReducer,
 });
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const reduxStore = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // Disable serializable check for Redux Persist
+    }),
 });
+
+export const persistor = persistStore(reduxStore);
