@@ -26,6 +26,7 @@ export default ({ mode }) => {
           "favicon-16x16.png",
           "favicon-32x32.png",
           "favicon.ico",
+          "splashScreen.png",
         ],
         manifest: {
           name: "chats with fun",
@@ -72,9 +73,6 @@ export default ({ mode }) => {
               type: "image/x-icon",
             },
           ],
-          "splash_screens": [{
-            
-          }]
         },
         workbox: {
           runtimeCaching: [
