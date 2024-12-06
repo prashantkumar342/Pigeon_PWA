@@ -26,7 +26,6 @@ export default ({ mode }) => {
           "favicon-16x16.png",
           "favicon-32x32.png",
           "favicon.ico",
-          "_redirects",
         ],
         manifest: {
           name: "chatting with fun",
