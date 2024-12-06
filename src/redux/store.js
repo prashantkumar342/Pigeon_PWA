@@ -15,7 +15,7 @@ import { combineReducers } from "redux";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"], // Add other slices you want to persist
+  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"], 
 };
 
 const rootReducer = combineReducers({

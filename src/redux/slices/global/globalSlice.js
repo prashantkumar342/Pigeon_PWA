@@ -70,6 +70,26 @@ const globalSlice = createSlice({
     addConversation(state, action) {
       state.conversations = [action.payload, ...state.conversations];
     },
+    // New reducers for optimistic UI updates
+    addLocalMessage(state, action) {
+      state.messages.push(action.payload);
+    },
+    replaceLocalMessage(state, action) {
+      const index = state.messages.findIndex(
+        (msg) =>
+          msg._id === action.payload._id || msg.tempId === action.payload.tempId
+      );
+      if (index !== -1) {
+        state.messages[index] = action.payload;
+      } else {
+        state.messages.push(action.payload);
+      }
+    },
+    revertLocalMessage(state, action) {
+      state.messages = state.messages.filter(
+        (msg) => msg._id !== action.payload && msg.tempId !== action.payload
+      );
+    },
   },
 });
 
@@ -88,6 +108,9 @@ export const {
   updateChatBoxData,
   clearChatBoxData,
   clearAllStates,
+  addLocalMessage,
+  replaceLocalMessage,
+  revertLocalMessage,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

@@ -6,13 +6,21 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import { setIsChatBox, updateChatBoxData, updateMessages } from "../../redux/slices/global/globalSlice";
+import {
+  setIsChatBox,
+  updateChatBoxData,
+  addLocalMessage,
+  replaceLocalMessage,
+  revertLocalMessage,
+  updateMessages,
+} from "../../redux/slices/global/globalSlice";
 import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../socket/socket";
 import BlinkingSkeletonList from "../Loaders/ListItemLoader";
+import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 
 function ChatBox() {
   const socket = useSocket();
@@ -75,12 +83,32 @@ function ChatBox() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (typedMessage.trim()) {
-      socket.emit("messageFromClient", {
+      const tempMessageId = uuidv4(); // Generate a temporary ID for optimistic update
+      const newMessage = {
+        _id: tempMessageId,
+        tempId: tempMessageId, // Include the temporary ID
         sender: userData._id,
         receiver: chatBoxData.id,
         content: typedMessage,
-        conversation: selectedConversationId, // Include conversation ID
+        conversation: selectedConversationId,
+        status: 'pending', // Mark it as pending initially
+        timestamp: new Date().toISOString(),
+      };
+
+      // Optimistically update the UI
+      dispatch(addLocalMessage(newMessage));
+      scrollToBottom();
+
+      socket.emit("messageFromClient", newMessage, (response) => {
+        if (response.status === 'ok') {
+          // Update the message with the server's response
+          dispatch(replaceLocalMessage({ ...response.message, tempId: tempMessageId }));
+        } else {
+          // Revert the optimistic update if there was an error
+          dispatch(revertLocalMessage(tempMessageId));
+        }
       });
+
       setTypedMessage("");
     }
   };

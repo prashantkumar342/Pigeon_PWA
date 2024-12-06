@@ -4,21 +4,21 @@ import Form from "./components/Forms/Form";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ConversationList from "./components/Conversation/Conversation";
 import Peoples from "./components/Discover/Peoples";
-
 //slices
 import { authenticateUser } from "./redux/slices/api/authenticateSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ScreenLoader from "./components/Loaders/ScreenLoader";
+import SplashScreen from "./splashScreen/SplashScreen";
 
 function App() {
   const dispatch = useDispatch();
   const { authLoading } = useSelector(state => state.authenticateUser);
   const { isLoggedIn } = useSelector(state => state.user);
-
+  const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     dispatch(authenticateUser());
   }, [dispatch]);
-
+  useEffect(() => { const handleDOMLoaded = () => { setIsLoaded(true); }; document.addEventListener('DOMContentLoaded', handleDOMLoaded); return () => { document.removeEventListener('DOMContentLoaded', handleDOMLoaded); }; }, []);
   return (
     <div>
       <Routes>
@@ -30,6 +30,7 @@ function App() {
         </Route>
         <Route path="*" element={<Navigate to="/dashboard/chat" />} /> {/* Redirect any unknown routes to the dashboard */}
       </Routes>
+      {!isLoaded && <SplashScreen />}
     </div>
   );
 }

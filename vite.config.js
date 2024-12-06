@@ -28,9 +28,9 @@ export default ({ mode }) => {
           "favicon.ico",
         ],
         manifest: {
-          name: "chatting with fun",
+          name: "chats with fun",
           short_name: "c4chats",
-          description: "A React app with PWA support",
+          description: "a chatting app",
           start_url: "/",
           display: "standalone",
           background_color: "#ffffff",
@@ -72,6 +72,9 @@ export default ({ mode }) => {
               type: "image/x-icon",
             },
           ],
+          "splash_screens": [{
+            
+          }]
         },
         workbox: {
           runtimeCaching: [
