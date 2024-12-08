@@ -4,6 +4,8 @@ import Form from "./components/Forms/Form";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ConversationList from "./components/Conversation/Conversation";
 import Peoples from "./components/Discover/Peoples";
+import ChatBox from "./components/Chatbox/ChatBox";
+import UserProfile from "./components/UserProfile/UserProfile";
 //slices
 import { authenticateUser } from "./redux/slices/api/authenticateSlice";
 import { useEffect, useState } from "react";
@@ -25,10 +27,13 @@ function App() {
         <Route path="/" element={authLoading ? <ScreenLoader /> : (isLoggedIn ? <Navigate to="/dashboard/chat" /> : <Form />)} />
         <Route path="/dashboard" element={authLoading ? <ScreenLoader /> : (isLoggedIn ? <Dashboard /> : <Navigate to="/" />)}>
           <Route index element={<ConversationList />} />
-          <Route path="chat" element={<ConversationList />} />
+          <Route path="chat" element={<ConversationList />}>
+            <Route path=":conversationId" element={<ChatBox />} />
+            <Route path="user" element={<UserProfile/>} />
+          </Route>
           <Route path="find" element={<Peoples />} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard/chat" />} /> {/* Redirect any unknown routes to the dashboard */}
+        
       </Routes>
       {!isLoaded && <SplashScreen />}
     </div>

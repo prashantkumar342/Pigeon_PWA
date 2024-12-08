@@ -9,12 +9,16 @@ const initialState = {
   conversations: [],
   selectedConversationId: null,
   chatBoxData: { username: "", status: "", avatar: "", id: "" },
+  recipient: [],
 };
 
 const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
+    setRecipient(state, action) {
+      state.recipient = action.payload;
+    },
     setIsDrawer(state, action) {
       state.isDrawer = action.payload;
     },
@@ -111,6 +115,7 @@ export const {
   addLocalMessage,
   replaceLocalMessage,
   revertLocalMessage,
+  setRecipient,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

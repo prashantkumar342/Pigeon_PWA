@@ -1,4 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
+
+import { primaryColor, secondaryColor } from "./src/styles/Var.js";
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -15,7 +18,8 @@ export default {
           "linear-gradient(90deg, hsla(00, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%)",
       },
       colors: {
-        "accent-color": "#8174A0",
+        primary: primaryColor,
+        secondary: secondaryColor,
       },
     },
   },

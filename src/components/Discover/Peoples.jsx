@@ -3,7 +3,7 @@ import { List, ListItem, ListItemAvatar, ListItemText, Avatar, TextField, Divide
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsPeoples, setIsChatBox, setChatBoxData, setMessages, setSelectedConversationId } from '../../redux/slices/global/globalSlice';
+import { setIsPeoples, setChatBoxData, setMessages, setSelectedConversationId } from '../../redux/slices/global/globalSlice';
 import { fetchUsers } from '../../redux/slices/api/fetchUsersSlice';
 import { setUsers } from '../../redux/slices/api/fetchUsersSlice';
 import ListLoader from '../Loaders/ListLoader';
@@ -38,7 +38,7 @@ function Peoples() {
         const messages = response.payload;
         dispatch(setMessages(messages));
       });
-    navigate("/dashboard/chat")
+    navigate("/dashboard/chat/user")
   }
   return (
     <div className="flex flex-col h-full max-sm:w-screen overflow-y-auto border-gray border-r-2">
@@ -103,7 +103,6 @@ function Peoples() {
                     onClick={() => {
                       handleClick(user._id);
                       dispatch(setUsers([]));
-                      dispatch(setIsChatBox(true));
                       dispatch(setIsPeoples(false));
                     }}
                   >

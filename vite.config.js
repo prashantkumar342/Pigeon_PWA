@@ -73,6 +73,12 @@ export default ({ mode }) => {
               type: "image/x-icon",
             },
           ],
+          splash_screens: [
+            {
+              src: "splashScreen.png",
+              type: "image/png",
+            },
+          ],
         },
         workbox: {
           runtimeCaching: [

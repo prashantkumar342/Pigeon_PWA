@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+// variables.scss
+
+$primary-color: #AD49E1;
+$secondary-color: #25D366;
+
+
 .screen-loader {
   width: 50px;
   aspect-ratio: 1;

@@ -4,12 +4,26 @@ import { logoutUser } from "../../redux/slices/api/logoutSlice"
 import { setUserData, setLoggedIn } from "../../redux/slices/global/userSlice"
 import { authenticateUser } from "../../redux/slices/api/authenticateSlice"
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+;
 function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector(state => state.user)
+  const { conversationId } = useParams();
+  let chatsParams;
+  let findParams
 
+  if (location.pathname === `/dashboard/chat/${conversationId}` || location.pathname === `/dashboard/chat` || location.pathname === `/dashboard/chat/user`) {
+    chatsParams = true
+  } else {
+    chatsParams = false
+  }
+  if (location.pathname === "/dashboard/find") {
+    findParams = true
+  } else {
+    findParams = false
+  }
 
   const logout = () => {
     dispatch(logoutUser())
@@ -26,7 +40,7 @@ function Sidebar() {
   }
 
   return (
-    <div className="flex flex-col items-center h-full bg-[#AD49E1] p-4">
+    <div className="flex flex-col items-center h-full bg-primary p-4">
       <div className="flex justify-center py-4">
         <Avatar sx={{ width: "50px", height: "50px", outline: "solid black" }} src={userData.avatar} />
       </div>
@@ -36,8 +50,8 @@ function Sidebar() {
 
           <IconButton sx={{
             fontSize: '25px',
-            color: location.pathname === "/dashboard/chat" ? "white" : "dark",
-            borderLeft: location.pathname === "/dashboard/chat" ? "2px solid white" : "none",
+            color: chatsParams ? "white" : "dark",
+            borderLeft: chatsParams ? "2px solid white" : "none",
             borderRadius: "0"
           }}
             component={Link}
@@ -47,8 +61,8 @@ function Sidebar() {
           </IconButton>
           <IconButton sx={{
             fontSize: '25px',
-            color: location.pathname === "/dashboard/find" ? "white" : "dark",
-            borderLeft: location.pathname === "/dashboard/find" ? "2px solid white" : "none",
+            color: findParams ? "white" : "dark",
+            borderLeft: findParams ? "2px solid white" : "none",
             borderRadius: "0"
           }}
             component={Link}

@@ -1,19 +1,21 @@
 
 
 import { useState, useEffect } from 'react';
-import { List, ListItem, Typography, ListItemAvatar, ListItemText, Avatar, TextField, Divider, Button, InputAdornment } from "@mui/material";
+import { List, ListItem, ListItemAvatar, ListItemText, Avatar, TextField, Divider, Button, InputAdornment } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { setIsChatBox, setChatBoxData, setSelectedConversationId, setMessages, updateConversation, addConversation, setConversations } from '../../redux/slices/global/globalSlice';
+import { setIsChatBox, setChatBoxData, setSelectedConversationId, setMessages, updateConversation, addConversation, setConversations, setRecipient } from '../../redux/slices/global/globalSlice';
 import { fetchConversation } from '../../redux/slices/api/conversationSlice';
 import { fetchRecipient } from '../../redux/slices/api/recipientSlice';
 import { fetchMessages } from '../../redux/slices/api/messagesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSocket } from '../../socket/socket';
 import ListLoader from '../Loaders/ListLoader';
+import { useNavigate } from 'react-router-dom';
 
 function ConversationList() {
   const dispatch = useDispatch();
   const socket = useSocket();
+  const navigate = useNavigate();
   const { status: conversationStatus } = useSelector(state => state.conversation);
   const { conversations } = useSelector(state => state.globalVar);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,20 +70,31 @@ function ConversationList() {
     };
   }, [socket, dispatch, conversations]);
 
-  const handleClick = (recipientId, convoId) => {
-    dispatch(setSelectedConversationId(convoId));
+  const handleClick = (recipientId) => {
+    dispatch(setSelectedConversationId(recipientId));
     dispatch(fetchRecipient(recipientId))
       .then(response => {
         const user = response.payload;
         dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }));
         dispatch(setIsChatBox(true));
       });
+    navigate(`/dashboard/chat/${recipientId}`)
     dispatch(fetchMessages())
       .then(response => {
         const messages = response.payload;
         dispatch(setMessages(messages));
       });
   };
+
+  const getRecpient = (recipientId) => {
+    dispatch(fetchRecipient(recipientId))
+      .then(response => {
+        const user = response.payload;
+        dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }));
+        dispatch(setRecipient(user))
+      });
+    navigate(`/dashboard/chat/user`)
+  }
 
   return (
     <div className="flex flex-col h-full max-sm:w-screen overflow-y-auto border-gray border-r-2">
@@ -106,10 +119,9 @@ function ConversationList() {
           }}
         />
       </div>
+
       <Divider />
-      <div className='p-2'>
-        <Typography variant="h6" sx={{ color: "black" }}>Conversations...</Typography>
-      </div>
+
       <div className="overflow-auto px-2">
         {
           conversationStatus === "loading" ? <ListLoader /> :
@@ -127,9 +139,11 @@ function ConversationList() {
                       marginBottom: "8px",
                       position: 'relative',
                     }}
-                    onClick={() => handleClick(convo.user._id, convo._id)}
+                    onClick={(e) => { e.stopPropagation(); handleClick(convo.user._id, convo._id) }}
                   >
-                    <ListItemAvatar>
+                    <ListItemAvatar
+                      onClick={(e) => { e.stopPropagation(); getRecpient(convo.user._id)}}
+                    >
                       <Avatar
                         src={convo.user.avatar}
                         sx={{
@@ -152,7 +166,7 @@ function ConversationList() {
                       }}
                     />
                   </ListItem>
-                  {index < filteredConversations.length - 1 && <Divider />}
+                  {index < filteredConversations.length - 1 && <Divider sx={{my:1}} />}
                 </div>
               ))}
             </List>
