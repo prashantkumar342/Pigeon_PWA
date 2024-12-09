@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { fetchMessages } from "../api/messagesSlice";
 
 const initialState = {
   isDrawer: false,
   isPeoples: false,
   isChatBox: false,
   conversation: [],
-  messages: [],
+  messages: [], // Initialize messages as an array
   conversations: [],
-  selectedConversationId: null,
+  selectedRecipientId: null,
   chatBoxData: { username: "", status: "", avatar: "", id: "" },
-  recipient: [],
+  recipient: {},
 };
 
 const globalSlice = createSlice({
@@ -40,16 +41,16 @@ const globalSlice = createSlice({
     setConversations(state, action) {
       state.conversations = action.payload;
     },
-    setSelectedConversationId(state, action) {
-      state.selectedConversationId = action.payload;
+    setSelectedRecipientId(state, action) {
+      state.selectedRecipientId = action.payload;
     },
     setChatBoxData(state, action) {
       state.chatBoxData = action.payload;
     },
     updateChatBoxData(state, action) {
       state.chatBoxData = {
-        ...state.chatBoxData, // Retain the existing data
-        ...action.payload, // Overwrite with new data
+        ...state.chatBoxData,
+        ...action.payload,
       };
     },
     clearChatBoxData(state) {
@@ -58,7 +59,6 @@ const globalSlice = createSlice({
     clearAllStates(state) {
       Object.assign(state, initialState);
     },
-    // New logic for updating and adding conversations
     updateConversation(state, action) {
       const index = state.conversations.findIndex(
         (convo) => convo._id === action.payload._id
@@ -68,13 +68,12 @@ const globalSlice = createSlice({
         state.conversations = [
           state.conversations[index],
           ...state.conversations.filter((_, i) => i !== index),
-        ]; // Move updated conversation to the top
+        ];
       }
     },
     addConversation(state, action) {
       state.conversations = [action.payload, ...state.conversations];
     },
-    // New reducers for optimistic UI updates
     addLocalMessage(state, action) {
       state.messages.push(action.payload);
     },
@@ -95,6 +94,21 @@ const globalSlice = createSlice({
       );
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchMessages.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.messages = action.payload;
+      })
+      .addCase(fetchMessages.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Something went wrong";
+      });
+  },
 });
 
 export const {
@@ -107,7 +121,7 @@ export const {
   setConversations,
   updateConversation,
   addConversation,
-  setSelectedConversationId,
+  setSelectedRecipientId,
   setChatBoxData,
   updateChatBoxData,
   clearChatBoxData,

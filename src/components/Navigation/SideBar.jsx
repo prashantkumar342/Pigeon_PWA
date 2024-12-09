@@ -14,7 +14,7 @@ function Sidebar() {
   let chatsParams;
   let findParams
 
-  if (location.pathname === `/dashboard/chat/${conversationId}` || location.pathname === `/dashboard/chat` || location.pathname === `/dashboard/chat/user`) {
+  if (location.pathname === `/dashboard/chat/${conversationId}` || location.pathname === `/dashboard` || location.pathname === `/dashboard/chat` || location.pathname === `/dashboard/chat/user`) {
     chatsParams = true
   } else {
     chatsParams = false

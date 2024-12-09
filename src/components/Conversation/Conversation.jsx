@@ -1,9 +1,7 @@
-
-
 import { useState, useEffect } from 'react';
 import { List, ListItem, ListItemAvatar, ListItemText, Avatar, TextField, Divider, Button, InputAdornment } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { setIsChatBox, setChatBoxData, setSelectedConversationId, setMessages, updateConversation, addConversation, setConversations, setRecipient } from '../../redux/slices/global/globalSlice';
+import { setIsChatBox, setChatBoxData, setSelectedRecipientId, setMessages, updateConversation, addConversation, setConversations, setRecipient } from '../../redux/slices/global/globalSlice';
 import { fetchConversation } from '../../redux/slices/api/conversationSlice';
 import { fetchRecipient } from '../../redux/slices/api/recipientSlice';
 import { fetchMessages } from '../../redux/slices/api/messagesSlice';
@@ -51,7 +49,6 @@ function ConversationList() {
           dispatch(addConversation(data));
         }
 
-        // Update filteredConversations to reflect changes
         setFilteredConversations(prevFilteredConversations => {
           const exists = prevFilteredConversations.find(convo => convo._id === data._id);
           if (exists) {
@@ -70,30 +67,36 @@ function ConversationList() {
     };
   }, [socket, dispatch, conversations]);
 
-  const handleClick = (recipientId) => {
-    dispatch(setSelectedConversationId(recipientId));
+  const handleClick = async (recipientId) => {
+    await dispatch(setSelectedRecipientId(recipientId));
     dispatch(fetchRecipient(recipientId))
       .then(response => {
         const user = response.payload;
         dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }));
+
         dispatch(setIsChatBox(true));
+        navigate(`/dashboard/chat/${recipientId}`);
       });
-    navigate(`/dashboard/chat/${recipientId}`)
     dispatch(fetchMessages())
       .then(response => {
-        const messages = response.payload;
-        dispatch(setMessages(messages));
+        const { responseStatus, messages } = response.payload;
+        if (responseStatus === 200) {
+          dispatch(setMessages(messages));
+        }
+
       });
   };
 
-  const getRecpient = (recipientId) => {
+  const getRecipient = async (recipientId) => {
+    dispatch(setMessages([]))
+    await dispatch(setSelectedRecipientId(recipientId))
     dispatch(fetchRecipient(recipientId))
       .then(response => {
         const user = response.payload;
         dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }));
-        dispatch(setRecipient(user))
+        dispatch(setRecipient(user));
+        navigate(`/dashboard/chat/user`);
       });
-    navigate(`/dashboard/chat/user`)
   }
 
   return (
@@ -139,10 +142,10 @@ function ConversationList() {
                       marginBottom: "8px",
                       position: 'relative',
                     }}
-                    onClick={(e) => { e.stopPropagation(); handleClick(convo.user._id, convo._id) }}
+                    onClick={(e) => { e.stopPropagation(); handleClick(convo.user._id) }}
                   >
                     <ListItemAvatar
-                      onClick={(e) => { e.stopPropagation(); getRecpient(convo.user._id)}}
+                      onClick={(e) => { e.stopPropagation(); getRecipient(convo.user._id) }}
                     >
                       <Avatar
                         src={convo.user.avatar}
@@ -166,7 +169,7 @@ function ConversationList() {
                       }}
                     />
                   </ListItem>
-                  {index < filteredConversations.length - 1 && <Divider sx={{my:1}} />}
+                  {index < filteredConversations.length - 1 && <Divider sx={{ my: 1 }} />}
                 </div>
               ))}
             </List>

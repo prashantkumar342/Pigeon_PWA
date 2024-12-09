@@ -23,6 +23,7 @@ function App() {
   useEffect(() => { const handleDOMLoaded = () => { setIsLoaded(true); }; document.addEventListener('DOMContentLoaded', handleDOMLoaded); return () => { document.removeEventListener('DOMContentLoaded', handleDOMLoaded); }; }, []);
   return (
     <div>
+      {!isLoaded && <SplashScreen />}
       <Routes>
         <Route path="/" element={authLoading ? <ScreenLoader /> : (isLoggedIn ? <Navigate to="/dashboard/chat" /> : <Form />)} />
         <Route path="/dashboard" element={authLoading ? <ScreenLoader /> : (isLoggedIn ? <Dashboard /> : <Navigate to="/" />)}>
@@ -35,7 +36,7 @@ function App() {
         </Route>
         
       </Routes>
-      {!isLoaded && <SplashScreen />}
+      
     </div>
   );
 }

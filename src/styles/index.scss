@@ -62,3 +62,17 @@ $secondary-color: #25D366;
   max-width: 80%;
   max-height: 80%;
 }
+
+/* HTML: <div class="loader"></div> */
+@keyframes typing {
+  0%, 80%, 100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.animate-typing {
+  animation: typing 1s infinite ease-in-out;
+}

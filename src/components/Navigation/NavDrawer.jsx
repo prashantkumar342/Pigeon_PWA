@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/api/logoutSlice"
 import { setUserData, setLoggedIn, } from "../../redux/slices/global/userSlice"
 import { authenticateUser } from "../../redux/slices/api/authenticateSlice"
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 
 function NavDrawer() {
@@ -14,6 +14,22 @@ function NavDrawer() {
   const dispatch = useDispatch();
   const { isDrawer } = useSelector(state => state.globalVar);
   const { userData } = useSelector(state => state.user)
+  const { conversationId } = useParams();
+
+  let chatsParams;
+  let findParams
+
+  if (location.pathname === `/dashboard/chat/${conversationId}` || location.pathname === `/dashboard` || location.pathname === `/dashboard/chat` || location.pathname === `/dashboard/chat/user`) {
+    chatsParams = true
+  } else {
+    chatsParams = false
+  }
+  if (location.pathname === "/dashboard/find") {
+    findParams = true
+  } else {
+    findParams = false
+  }
+
   const logout = () => {
     dispatch(logoutUser())
       .then(response => {
@@ -59,10 +75,10 @@ function NavDrawer() {
             onClick={() => { dispatch(setIsDrawer(false)) }}
           >
             <ListItemIcon sx={{
-              color: location.pathname === "/dashboard/chat" ? "white" : "dark",
+              color: chatsParams ? "white" : "dark",
             }}><Chat /></ListItemIcon>
             <ListItemText primary="Chats" sx={{
-              color: location.pathname === "/dashboard/chat" ? "white" : "dark",
+              color: chatsParams ? "white" : "dark",
             }} />
           </ListItem>
 
@@ -76,10 +92,10 @@ function NavDrawer() {
             onClick={() => { dispatch(setIsDrawer(false)) }}
           >
             <ListItemIcon sx={{
-              color: location.pathname === "/dashboard/find" ? "white" : "dark",
+              color: findParams ? "white" : "dark",
             }}><Search /></ListItemIcon>
             <ListItemText primary="Search" sx={{
-              color: location.pathname === "/dashboard/find" ? "white" : "dark",
+              color: findParams ? "white" : "dark",
             }} />
           </ListItem>
         </List>

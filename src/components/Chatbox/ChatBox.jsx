@@ -12,7 +12,7 @@ import {
   replaceLocalMessage,
   revertLocalMessage,
   updateMessages,
-
+  setSelectedRecipientId,
 } from "../../redux/slices/global/globalSlice";
 import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -20,6 +20,7 @@ import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../socket/socket";
 import BlinkingSkeletonList from "../Loaders/ListItemLoader";
+import TypingIndicator from "../Loaders/TypingIndicator";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
 import { useNavigate } from "react-router-dom";
 
@@ -30,11 +31,12 @@ function ChatBox() {
   const {
     chatBoxData = { username: "", status: "", avatar: "", id: "" },
     messages,
-    selectedConversationId,
+    selectedRecipientId,
   } = useSelector((state) => state.globalVar);
   const { userData } = useSelector((state) => state.user);
   const { recipientLoading } = useSelector((state) => state.recipient);
   const [typedMessage, setTypedMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -45,7 +47,7 @@ function ChatBox() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   useEffect(() => {
     if (socket) {
@@ -71,40 +73,56 @@ function ChatBox() {
   useEffect(() => {
     if (socket) {
       const handleReceiveMessage = (data) => {
-        console.log(data);
-        if (data.conversation === selectedConversationId) {
+        if (
+          data.receiver === selectedRecipientId ||
+          data.sender === selectedRecipientId
+        ) {
           dispatch(updateMessages(data));
         }
       };
 
       socket.on("receiveMessage", handleReceiveMessage);
 
+      const handleTyping = (data) => {
+        if (data.sender === selectedRecipientId) {
+          setIsTyping(true);
+          setTimeout(() => setIsTyping(false), 3000); // Clear typing indicator after 3 seconds
+        }
+      };
+
+      socket.on("typing", handleTyping);
+
       return () => {
         socket.off("receiveMessage", handleReceiveMessage);
+        socket.off("typing", handleTyping);
       };
     }
-  }, [socket, selectedConversationId, dispatch]);
+  }, [socket, selectedRecipientId, dispatch]);
 
   const handleBack = () => {
-    navigate("/dashboard/chat")
+    dispatch(setSelectedRecipientId(null));
+    navigate("/dashboard/chat");
+  };
+
+  const handleTyping = (e) => {
+    setTypedMessage(e.target.value);
+    socket.emit("typing", { sender: userData._id, receiver: chatBoxData.id });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (typedMessage.trim()) {
-      const tempMessageId = uuidv4(); // Generate a temporary ID for optimistic update
+      const tempMessageId = uuidv4();
       const newMessage = {
         _id: tempMessageId,
-        tempId: tempMessageId, // Include the temporary ID
+        tempId: tempMessageId,
         sender: userData._id,
         receiver: chatBoxData.id,
         content: typedMessage,
-        conversation: selectedConversationId,
-        status: "pending", // Mark it as pending initially
+        conversation: selectedRecipientId,
+        status: "pending",
         timestamp: new Date().toISOString(),
       };
-
-      // Optimistically update the UI
       dispatch(addLocalMessage(newMessage));
       scrollToBottom();
 
@@ -122,6 +140,21 @@ function ChatBox() {
 
       setTypedMessage("");
     }
+  };
+
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    if (isNaN(date)) {
+      return "";
+    }
+    return date
+      .toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .replace("AM", "am")
+      .replace("PM", "pm");
   };
 
   return (
@@ -151,30 +184,41 @@ function ChatBox() {
         </ListItem>
       )}
       <div className="flex-grow h-1 overflow-auto p-4 space-y-2 bg-white">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${message.sender === userData._id ? "justify-end" : "justify-start"
-              }`}
-          >
+        {messages.length ? (
+          messages.map((message, index) => (
             <div
-              className={`p-2 max-w-xs ${message.sender === userData._id
-                ? "bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl text-white"
-                : "bg-gray-200 rounded-b-2xl rounded-tr-2xl text-black"
+              key={index}
+              className={`flex ${message.sender === userData._id
+                  ? "justify-end"
+                  : "justify-start"
                 }`}
             >
-              {message.content}
-              <div className={`text-right text-xs mt-1 ${message.sender === userData._id ? "text-slate-300" : "text-slate-500"}`}>
-                {new Date(message.createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                }).replace("AM", "am").replace("PM", "pm")}
+              <div
+                className={`p-2 max-w-xs ${message.sender === userData._id
+                    ? "bg-primary rounded-tl-2xl rounded-bl-2xl rounded-tr-2xl text-white"
+                    : "bg-gray-200 rounded-b-2xl rounded-tr-2xl text-black"
+                  }`}
+              >
+                {message.content}
+                <div
+                  className={`text-right text-xs mt-1 ${message.sender === userData._id
+                      ? "text-slate-300"
+                      : "text-slate-500"
+                    }`}
+                >
+                  {formatTime(message.createdAt)}
+                </div>
               </div>
-
             </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500">No messages yet.</div>
+        )}
+        {isTyping && (
+          <div className="flex justify-start  w-fit p-1 max-w-xs bg-gray-200 rounded-b-2xl rounded-tr-2xl text-black">
+            <TypingIndicator />
           </div>
-        ))}
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="p-3 bg-gray-100 border-t max-sm:border-none border-gray-300 flex items-center">
@@ -184,7 +228,7 @@ function ChatBox() {
             variant="outlined"
             placeholder="Type a message"
             fullWidth
-            onChange={(e) => setTypedMessage(e.target.value)}
+            onChange={handleTyping}
             value={typedMessage}
             sx={{ ml: 1, flexGrow: 1 }}
             size="small"

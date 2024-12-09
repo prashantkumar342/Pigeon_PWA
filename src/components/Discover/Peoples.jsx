@@ -3,12 +3,11 @@ import { List, ListItem, ListItemAvatar, ListItemText, Avatar, TextField, Divide
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsPeoples, setChatBoxData, setMessages, setSelectedConversationId } from '../../redux/slices/global/globalSlice';
+import { setChatBoxData, setSelectedRecipientId, setMessages } from '../../redux/slices/global/globalSlice';
 import { fetchUsers } from '../../redux/slices/api/fetchUsersSlice';
 import { setUsers } from '../../redux/slices/api/fetchUsersSlice';
 import ListLoader from '../Loaders/ListLoader';
 import { fetchRecipient } from "../../redux/slices/api/recipientSlice"
-import { fetchMessages } from '../../redux/slices/api/messagesSlice';
 import { useNavigate } from 'react-router-dom';
 
 function Peoples() {
@@ -26,18 +25,17 @@ function Peoples() {
   const clearSearch = () => {
     setSearchQuery('');
   };
-  const handleClick = (recipientId) => {
-    dispatch(setSelectedConversationId(recipientId));
+
+  const handleClick = async (recipientId) => {
+
+    await dispatch(setSelectedRecipientId(recipientId));
+    dispatch(setMessages([]))
     dispatch(fetchRecipient(recipientId))
       .then(response => {
         const user = response.payload
         dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }))
+
       })
-    dispatch(fetchMessages())
-      .then(response => {
-        const messages = response.payload;
-        dispatch(setMessages(messages));
-      });
     navigate("/dashboard/chat/user")
   }
   return (
@@ -103,7 +101,6 @@ function Peoples() {
                     onClick={() => {
                       handleClick(user._id);
                       dispatch(setUsers([]));
-                      dispatch(setIsPeoples(false));
                     }}
                   >
                     <ListItemAvatar>

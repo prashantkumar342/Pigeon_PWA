@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Async thunk to fetch messages
@@ -8,23 +8,23 @@ export const fetchMessages = createAsyncThunk(
     try {
       // Access the global state
       const state = getState();
-      const conversationId = state.globalVar.selectedConversationId;
+      const recipientId = state.globalVar.selectedRecipientId;
 
-      if (!conversationId) {
-        throw new Error("No conversation selected");
+      if (!recipientId) {
+        throw new Error("No recipient selected");
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_FETCH_MESSAGES}/${conversationId}`,
+        `${import.meta.env.VITE_FETCH_MESSAGES}/${recipientId}`,
         {
           withCredentials: true,
         }
       );
-      return response.data;
+      return { responseStatus: response.status, messages: response.data };
     } catch (error) {
-      return rejectWithValue(
-        error.response ? error.response.data : error.message
-      );
+      const responseStatus = error.response ? error.response.status : 500;
+      const messages = error.response ? error.response.data : error.message;
+      return rejectWithValue({ responseStatus, messages });
     }
   }
 );
@@ -32,7 +32,7 @@ export const fetchMessages = createAsyncThunk(
 const messagesSlice = createSlice({
   name: "messages",
   initialState: {
-    status: "idle", // idle | loading | succeeded | failed
+    status: "idle",
     error: null,
   },
   reducers: {},
@@ -47,7 +47,7 @@ const messagesSlice = createSlice({
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload || "Something went wrong";
+        state.error = action.payload.messages || "Something went wrong";
       });
   },
 });

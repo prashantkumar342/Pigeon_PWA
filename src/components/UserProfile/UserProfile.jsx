@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useDispatch, useSelector } from "react-redux";
-import { updateChatBoxData, setSelectedConversationId, setMessages } from "../../redux/slices/global/globalSlice";
+import { updateChatBoxData, setSelectedRecipientId, setMessages } from "../../redux/slices/global/globalSlice";
 import { fetchMessages } from "../../redux/slices/api/messagesSlice";
 import { useEffect } from "react";
 import { useSocket } from "../../socket/socket";
@@ -46,19 +46,23 @@ function UserProfile() {
   }, [socket, chatBoxData, dispatch]);
 
   const handleBack = () => {
+    dispatch(setSelectedRecipientId(null))
     navigate("/dashboard/chat");
   };
 
   const handleSendMessage = () => {
     if (recipient) {
-      const conversationId = recipient._id;
-      dispatch(setSelectedConversationId(conversationId));
       dispatch(fetchMessages())
         .then(response => {
-          const messages = response.payload;
-          dispatch(setMessages(messages));
+          const { responseStatus, messages } = response.payload;
+          if (responseStatus !== 200) {
+            dispatch(setMessages([]));
+          } else {
+            dispatch(setMessages(messages));
+          }
+
         });
-      navigate(`/dashboard/chat/${conversationId}`);
+      navigate(`/dashboard/chat/${recipient._id}`);
     }
   };
 
@@ -100,7 +104,7 @@ function UserProfile() {
           <Button
             variant="contained"
             disableElevation
-            startIcon={<Message/>}
+            startIcon={<Message />}
             sx={{ mb: 2, textTransform: "none", backgroundColor: "#AD49E1", "&:hover": { backgroundColor: "#25D366" } }}
             onClick={handleSendMessage}
           >

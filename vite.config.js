@@ -29,9 +29,9 @@ export default ({ mode }) => {
           "splashScreen.png",
         ],
         manifest: {
-          name: "chats with fun",
-          short_name: "c4chats",
-          description: "a chatting app",
+          name: "Pigeon Your Own Messenger",
+          short_name: "Pigeon",
+          description: "pigeon a realtime fastest messenger wihout feathers",
           start_url: "/",
           display: "standalone",
           background_color: "#ffffff",
@@ -71,12 +71,6 @@ export default ({ mode }) => {
               src: "512x512_icon.png",
               sizes: "512x512",
               type: "image/x-icon",
-            },
-          ],
-          splash_screens: [
-            {
-              src: "splashScreen.png",
-              type: "image/png",
             },
           ],
         },
