@@ -1,98 +1,49 @@
-import {
-  useMediaQuery,
-  useTheme,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Avatar,
-  Typography,
-} from "@mui/material";
-import { setIsDrawer } from "../../redux/slices/global/globalSlice";
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import { useMediaQuery, useTheme, Typography } from "@mui/material";
 import ChatBox from "../Chatbox/ChatBox";
 import UserProfile from "../UserProfile/UserProfile";
-import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../Navigation/SideBar";
 import NavDrawer from "../Navigation/NavDrawer";
-import { useDispatch, useSelector } from "react-redux";
-import { primaryColor } from "../../styles/Var";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import Chats from "../Conversation/Conversation";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 function Dashboard() {
-  const dispatch = useDispatch();
   const theme = useTheme();
-  const { userData } = useSelector((state) => state.user);
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const { selectedRecipientId } = useSelector((state) => state.globalVar);
   const location = useLocation();
-  const { conversationId } = useParams();
+
+  const query = new URLSearchParams(location.search);
+  const conversationId = query.get("conversationId");
 
   const isUserProfileRoute = location.pathname.includes("user");
-  const isChatRoute = location.pathname.includes(conversationId);
+
+  useEffect(() => {
+    if (location.pathname.includes("chat") && !isUserProfileRoute) {
+      if (!conversationId || conversationId !== selectedRecipientId) {
+        navigate("/dashboard/chat");
+      }
+    }
+  }, [
+    location.pathname,
+    conversationId,
+    selectedRecipientId,
+    isUserProfileRoute,
+    navigate,
+  ]);
+
+  const isChatRoute = conversationId && conversationId === selectedRecipientId;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
       <div className="flex flex-row flex-grow h-full overflow-hidden">
         {isSmallScreen ? <NavDrawer /> : <Sidebar />}
         <div className="flex-grow flex flex-col h-full">
-          <AppBar
-            position="static"
-            elevation={0}
-            sx={{
-              background: `${primaryColor}`,
-              height: "55px",
-              justifyContent: "center",
-            }}
-          >
-            <Toolbar className="flex justify-between">
-              {!isSmallScreen ? (
-                <Typography variant="h5" sx={{ marginLeft: "10px" }}>
-                  Chatty
-                </Typography>
-              ) : null}
-
-              {isSmallScreen ? (
-                <div className="flex items-center w-full">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    onClick={() => dispatch(setIsDrawer(true))}
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h5" sx={{ marginLeft: "10px" }}>
-                    C4Chat
-                  </Typography>
-                  <div className=" flex ml-auto items-center space-x-4">
-                    <IconButton sx={{
-                      outline: "solid 1px",
-                      padding: "2px",
-                      color: "white",
-                      backgroundColor: "black"
-                    }}>
-                      <NotificationsIcon />
-                    </IconButton>
-                    <Avatar src={userData.avatar} />
-                  </div>
-                </div>
-              ) : (
-                <div className=" flex ml-auto items-center space-x-4">
-                  <IconButton sx={{
-                    outline: "solid 1px",
-                    padding: "2px",
-                    color: "white",
-                    backgroundColor: "black"
-                  }}>
-                    <NotificationsIcon />
-                  </IconButton>
-                </div>
-              )}
-            </Toolbar>
-          </AppBar>
-
           <div className="flex max-sm:flex-col flex-grow overflow-hidden">
             <div className="flex-none w-[300px] max-w-[350px] max-sm:w-full">
-              <Outlet />
+              <Chats />
             </div>
             <div className="flex-grow max-sm:w-full">
               {isChatRoute ? (
@@ -106,7 +57,6 @@ function Dashboard() {
                   </Typography>
                 </div>
               )}
-
             </div>
           </div>
         </div>

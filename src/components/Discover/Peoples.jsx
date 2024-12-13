@@ -1,20 +1,37 @@
-import { useState, useEffect } from 'react';
-import { List, ListItem, ListItemAvatar, ListItemText, Avatar, TextField, Divider, Button, Box, IconButton, Typography, InputAdornment } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
-import { useDispatch, useSelector } from 'react-redux';
-import { setChatBoxData, setSelectedRecipientId, setMessages } from '../../redux/slices/global/globalSlice';
-import { fetchUsers } from '../../redux/slices/api/fetchUsersSlice';
-import { setUsers } from '../../redux/slices/api/fetchUsersSlice';
-import ListLoader from '../Loaders/ListLoader';
-import { fetchRecipient } from "../../redux/slices/api/recipientSlice"
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import {
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  TextField,
+  Divider,
+  Button,
+  Box,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setChatBoxData,
+  setSelectedRecipientId,
+  setMessages,
+  setRecipient,
+} from "../../redux/slices/global/globalSlice";
+import { fetchUsers } from "../../redux/slices/api/fetchUsersSlice";
+import { setUsers } from "../../redux/slices/api/fetchUsersSlice";
+import ListLoader from "../Loaders/ListLoader";
+import { fetchRecipient } from "../../redux/slices/api/recipientSlice";
+import { useNavigate } from "react-router-dom";
 
 function Peoples() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { fetchLoading, users, error } = useSelector(state => state.users);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { fetchLoading, users, error } = useSelector((state) => state.users);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (searchQuery) {
@@ -23,30 +40,38 @@ function Peoples() {
   }, [searchQuery, dispatch]);
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
-  const handleClick = async (recipientId) => {
+    const getRecipient = async (recipientId) => {
+      dispatch(setMessages([]));
+      await dispatch(setSelectedRecipientId(recipientId));
+      dispatch(fetchRecipient(recipientId)).then((response) => {
+        const user = response.payload;
+        dispatch(
+          setChatBoxData({
+            username: user.username,
+            status: user.status,
+            avatar: user.avatar,
+            id: user._id,
+          })
+        );
+        dispatch(setRecipient(user));
+        navigate(`/dashboard/chat/user`);
+      });
+    };
 
-    await dispatch(setSelectedRecipientId(recipientId));
-    dispatch(setMessages([]))
-    dispatch(fetchRecipient(recipientId))
-      .then(response => {
-        const user = response.payload
-        dispatch(setChatBoxData({ username: user.username, status: user.status, avatar: user.avatar, id: user._id }))
-
-      })
-    navigate("/dashboard/chat/user")
-  }
   return (
-    <div className="flex flex-col h-full max-sm:w-screen overflow-y-auto border-gray border-r-2">
-      <Box sx={{ p: 2, bg: 'gray.100', borderBottom: '1px solid #ccc' }}>
+    <div className="flex flex-col h-full max-sm:w-screen overflow-y-auto">
+      <Box sx={{ px: 1, pb: 1 }}>
         <TextField
           variant="outlined"
-          placeholder="Search..."
+          placeholder="Find Peoples"
           size="small"
           fullWidth
-          slotProps={{
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <SearchIcon color="action" />
@@ -57,84 +82,73 @@ function Peoples() {
                 <IconButton
                   onClick={() => {
                     clearSearch();
-                    dispatch(setUsers([]))
-                  }
-                  }
+                    dispatch(setUsers([]));
+                  }}
                 >
                   <CloseIcon sx={{ color: "#6E00FF" }} />
                 </IconButton>
               </InputAdornment>
             ),
             style: {
-              borderRadius: "20px",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              paddingRight: '10px',
+              borderRadius: "15px",
+              paddingRight: "10px",
             },
           }}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </Box>
-      <Divider />
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h6" sx={{ color: "black" }}>Peoples</Typography>
-      </Box>
       {error && <p>Error: {error}</p>}
-      {users.length > 0 && (
-        <div className="overflow-auto px-2 flex-grow">
-          {fetchLoading ? (
-            <ListLoader />
-          ) : (
-            <List>
-              {users.map((user, index) => (
-                <div key={user._id}>
-                  <ListItem
-                    component={Button}
-                    sx={{
-                      textTransform: "none",
-                      color: "black",
-                      outline: "2px solid transparent",
-                      borderRadius: "8px",
-                      background: "#AD49E1",
-                      marginBottom: "8px",
-                    }}
-                    onClick={() => {
-                      handleClick(user._id);
-                      dispatch(setUsers([]));
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        src={user.avatar}
-                        sx={{
-                          boxShadow: "0 3px 5px 2px rgba(0, 0, 0, .3)",
-                        }}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={user.username}
-                      secondary={user.email}
+      <div className="overflow-y-auto h-full px-2">
+        {fetchLoading ? (
+          <ListLoader />
+        ) : (
+          <List>
+            {users.map((user, index) => (
+              <div key={user._id}>
+                <ListItem
+                  component={Button}
+                  sx={{
+                    textTransform: "none",
+                    color: "black",
+                    outline: "none",
+                    borderRadius: "0px",
+                    margin: "0px",
+                    position: "relative",
+                  }}
+                  onClick={() => {
+      
+                    getRecipient(user._id);
+                    dispatch(setUsers([]));
+                  }}
+                >
+                  <ListItemAvatar>
+                    <Avatar
+                      src={user.avatar}
                       sx={{
-                        marginLeft: "16px",
-                        "& .MuiListItemText-primary": {
-                          fontWeight: "bold",
-                          color: "white",
-                        },
-                        "& .MuiListItemText-secondary": {
-                          color: "white",
-                        },
+                        boxShadow: "0 3px 5px 2px rgba(0, 0, 0, .3)",
                       }}
                     />
-                  </ListItem>
-                  {index < users.length - 1 && <Divider />}
-                </div>
-              ))}
-            </List>
-          )}
-        </div>
-      )}
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={user.username}
+                    secondary={user.email}
+                    sx={{
+                      "& .MuiListItemText-primary": {
+                        fontWeight: "bold",
+                        color: "black",
+                      },
+                      "& .MuiListItemText-secondary": {
+                        color: "black",
+                      },
+                    }}
+                  />
+                </ListItem>
+                {index < users.length - 1 && <Divider />}
+              </div>
+            ))}
+          </List>
+        )}
+      </div>
     </div>
-
   );
 }
 

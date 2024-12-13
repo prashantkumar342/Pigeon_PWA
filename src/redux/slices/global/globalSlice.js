@@ -5,6 +5,8 @@ const initialState = {
   isDrawer: false,
   isPeoples: false,
   isChatBox: false,
+  customPrompt: false,
+  selectedImage: true,
   conversation: [],
   messages: [], // Initialize messages as an array
   conversations: [],
@@ -17,6 +19,12 @@ const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
+    setSelectedImage(state, action) {
+      state.selectedImage = action.payload;
+    },
+    setCustomPrompt(state, action) {
+      state.customPrompt = action.payload;
+    },
     setRecipient(state, action) {
       state.recipient = action.payload;
     },
@@ -130,6 +138,10 @@ export const {
   replaceLocalMessage,
   revertLocalMessage,
   setRecipient,
+  setCustomPrompt,
+  customPrompt,
+  selectedImage,
+  setSelectedImage,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;
