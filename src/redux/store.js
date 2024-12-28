@@ -10,12 +10,14 @@ import logoutUserReducer from "./slices/api/logoutSlice";
 import recipientReducer from "./slices/api/recipientSlice";
 import conversationReducer from "./slices/api/conversationSlice";
 import messagesReducer from "./slices/api/messagesSlice";
+import fetchRequestsReducer from "./slices/api/fetchRequestSlice";
+import fetchFriendsReducer from "./slices/api/fetchFriendsSlice";
 import { combineReducers } from "redux";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"], 
+  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"],
 };
 
 const rootReducer = combineReducers({
@@ -28,6 +30,8 @@ const rootReducer = combineReducers({
   recipient: recipientReducer,
   conversation: conversationReducer,
   messages: messagesReducer,
+  requests: fetchRequestsReducer,
+  friends: fetchFriendsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

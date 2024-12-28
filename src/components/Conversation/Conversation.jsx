@@ -7,14 +7,14 @@ import {
   useTheme,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import FriendList from "../Friends/FriendList";
+import Friend from "../Friends/Friend";
 import Peoples from "../Discover/Peoples";
+import MoreOptions from "../Menus/MoreOptions"
 import {
   setIsDrawer,
 } from "../../redux/slices/global/globalSlice";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MenuIcon from "@mui/icons-material/Menu";
 import ConversationList from "./ConversationList";
 import { Message } from "@mui/icons-material";
@@ -29,6 +29,10 @@ function Chats() {
     setTabValue(newValue);
   };
 
+  const moreOptions = [
+    "comming soon"
+  ]
+
   return (
     <div className="flex flex-col h-screen max-sm:w-screen overflow-hidden border-gray border-r-2">
       <TabContext value={tabValue}>
@@ -36,7 +40,7 @@ function Chats() {
           <div className="flex flex-row items-center pl-2  bg-white">
             <div className="mr-auto ml-2 my-2">
               <Typography
-                variant="h5"
+                variant="h4"
                 sx={{ color: "purple", fontWeight: "bold" }}
                 fontFamily="monospace"
               >
@@ -56,14 +60,7 @@ function Chats() {
                 </IconButton>
               ) : null}
 
-              <IconButton
-                sx={{
-                  padding: "1px",
-                  marginX: "3px",
-                }}
-              >
-                <MoreVertIcon />
-              </IconButton>
+              <MoreOptions options={moreOptions} />
             </div>
           </div>
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -92,7 +89,7 @@ function Chats() {
                   height: "100%",
                 }}
               >
-                <FriendList />
+                <Friend />
               </TabPanel>
             )}
             {tabValue === "3" && (

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import axios from "axios";
 import PropTypes from "prop-types";
 import { v4 as uuidv4 } from "uuid";
@@ -30,6 +31,7 @@ function SendImage({ option1, option2, dialogTitle }) {
   const { userData } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [imageUrl, setImageUrl] = useState(null);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     if (selectedImage) {
@@ -50,6 +52,7 @@ function SendImage({ option1, option2, dialogTitle }) {
 
   const handleSendImage = async () => {
     try {
+      setSending(true);
       let cloudImageUrl = "";
       if (selectedImage) {
         const options = {
@@ -96,6 +99,8 @@ function SendImage({ option1, option2, dialogTitle }) {
       }
     } catch (error) {
       console.error("error sending image", error);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -127,12 +132,18 @@ function SendImage({ option1, option2, dialogTitle }) {
         >
           {option1}
         </Button>
-        <Button
-          sx={{ textTransform: "none", fontSize: 17 }}
+        <LoadingButton
+          sx={{
+            textTransform: "none",
+            fontSize: 17,
+          }}
+          loading={sending}
+          variant="text"
           onClick={handleSendImage}
+          // loadingPosition="start"
         >
           {option2}
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

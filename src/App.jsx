@@ -15,7 +15,7 @@ function App() {
   const { authLoading } = useSelector((state) => state.authenticateUser);
   const { isLoggedIn } = useSelector((state) => state.user);
   const [isLoaded, setIsLoaded] = useState(false);
-
+  
   useEffect(() => {
     dispatch(authenticateUser());
   }, [dispatch]);

@@ -33,6 +33,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../socket/socket";
 import ListLoader from "../Loaders/ListLoader";
 import { useNavigate } from "react-router-dom";
+import CustomContextMenu from "../Menus/ContextMenu";
 
 function ConversationList() {
   const dispatch = useDispatch();
@@ -45,6 +46,43 @@ function ConversationList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredConversations, setFilteredConversations] = useState([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const [menuPosition, setMenuPosition] = useState(null);
+  const [contextOptions, setContextOptions] = useState([]);
+
+  const handleContextMenu = (event) => {
+    event.preventDefault();
+    const { clientX: x, clientY: y } = event;
+    setMenuPosition({ x, y });
+    setContextOptions([
+      { label: "this feature", onClick: () => null },
+      { label: "comming soon", onClick: () => null },
+    ]);
+  };
+  const handleTouchStart = (event) => {
+    const touch = event.touches[0];
+    setTimeout(() => {
+      setMenuPosition({ x: touch.clientX, y: touch.clientY });
+       setContextOptions([
+         { label: "this feature", onClick: () => null },
+         { label: "comming soon", onClick: () => null },
+       ]);
+    }, 500);
+  };
+  const handleClose = () => {
+    setMenuPosition(null);
+  };
+
+  useEffect(() => {
+    const handleClick = () => {
+      if (!menuPosition) return;
+      handleClose();
+    };
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [menuPosition]);
 
   useEffect(() => {
     dispatch(fetchConversation()).then((response) => {
@@ -204,6 +242,8 @@ function ConversationList() {
                     e.stopPropagation();
                     handleClick(convo.user._id);
                   }}
+                  onContextMenu={handleContextMenu}
+                  onTouchStart={handleTouchStart}
                 >
                   {" "}
                   <ListItemAvatar
@@ -265,6 +305,11 @@ function ConversationList() {
             ))}{" "}
           </List>
         )}
+        <CustomContextMenu
+          menuPosition={menuPosition}
+          options={contextOptions}
+          onClose={handleClose}
+        />
       </div>
     </div>
   );

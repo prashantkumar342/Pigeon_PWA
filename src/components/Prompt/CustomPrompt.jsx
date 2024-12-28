@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
   Dialog,
@@ -6,7 +5,6 @@ import {
   DialogTitle,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import { setCustomPrompt } from "../../redux/slices/global/globalSlice";
 
 function CustomPrompt({
   option1,
@@ -15,15 +13,15 @@ function CustomPrompt({
   option2,
   dialogTitle,
   dialogContent,
+  open,
+  onClose
 }) {
-  const dispatch = useDispatch();
-  const { customPrompt } = useSelector((state) => state.globalVar);
 
   return (
     <div className="backdrop-blur-md fixed inset-0 z-50">
       <Dialog
-        open={customPrompt}
-        onClose={() => dispatch(setCustomPrompt(false))}
+        open={open}
+        onClose={onClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -55,6 +53,8 @@ CustomPrompt.propTypes = {
   action1: PropTypes.func.isRequired,
   action2: PropTypes.func.isRequired,
   dialogContent: PropTypes.node.isRequired,
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default CustomPrompt;

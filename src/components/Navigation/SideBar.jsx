@@ -11,7 +11,6 @@ import {
 import { Chat, Logout } from "@mui/icons-material";
 import { logoutUser } from "../../redux/slices/api/logoutSlice";
 import { setUserData, setLoggedIn } from "../../redux/slices/global/userSlice";
-import { setCustomPrompt } from "../../redux/slices/global/globalSlice";
 import { authenticateUser } from "../../redux/slices/api/authenticateSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -20,8 +19,8 @@ import CustomPrompt from "../Prompt/CustomPrompt";
 function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [customPrompt, setCustomPrompt] = useState(false);
   const { userData } = useSelector((state) => state.user);
-  const { customPrompt } = useSelector((state) => state.globalVar);
   const [clearData, setClearData] = useState(false); // Track checkbox state
   const { conversationId } = useParams();
   let chatsParams;
@@ -52,7 +51,7 @@ function Sidebar() {
       if (status === 200) {
         if (clearData) {
           clearWebsiteData();
-        } 
+        }
         dispatch(authenticateUser());
         dispatch(setUserData(null));
         dispatch(setLoggedIn(false));
@@ -87,7 +86,7 @@ function Sidebar() {
         <IconButton
           sx={{ color: "white", fontSize: "30px" }}
           onClick={() => {
-            dispatch(setCustomPrompt(true));
+            setCustomPrompt(true);
           }}
         >
           <Logout fontSize="inherit" />
@@ -95,13 +94,19 @@ function Sidebar() {
         {customPrompt && (
           <CustomPrompt
             option1="Cancel"
-            action1={() => dispatch(setCustomPrompt(false))}
+            action1={() => setCustomPrompt(false)}
             action2={() => {
               logout();
-              dispatch(setCustomPrompt(false));
+              setCustomPrompt(false);
             }}
             option2="Logout"
             dialogTitle="Are you sure you want to logout?"
+            open={() => {
+              setCustomPrompt(true);
+            }}
+            onClose={() => {
+              setCustomPrompt(false);
+            }}
             dialogContent={
               <DialogContent>
                 <DialogContentText id="dialog-description">
