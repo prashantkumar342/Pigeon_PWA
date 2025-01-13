@@ -75,7 +75,7 @@ function FriendsList() {
         <TextField
           variant="outlined"
           placeholder="Search Friends"
-          size="small"
+          size="medium"
           fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -128,6 +128,7 @@ function FriendsList() {
                   borderRadius: "0px",
                   margin: "0px",
                   position: "relative",
+                  paddingY: 2,
                 }}
                 onClick={() => getRecipient(friend._id)}
               >

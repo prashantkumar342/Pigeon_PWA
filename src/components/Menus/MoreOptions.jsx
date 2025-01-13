@@ -4,6 +4,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
+import { Divider } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 
@@ -46,16 +47,30 @@ export default function MoreOptions({ options }) {
           },
         }}
       >
-        {options.map((option) => (
-          <MenuItem key={option} onClick={handleClose}>
-            {option}
-          </MenuItem>
-        ))}
+        {options.map((option, index) => (
+          <>
+            <MenuItem
+              key={option.label}
+              onClick={() => {
+                handleClose();
+                option.action();
+              }}
+            >
+              {option.label}
+            </MenuItem>
+            {index < options.length - 1 && <Divider />}
+          </>))}
+
       </Menu>
     </div>
   );
 }
 
 MoreOptions.propTypes = {
-  options: PropTypes.array.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      action: PropTypes.func.isRequired,
+    })
+  ).isRequired,
 };

@@ -3,14 +3,13 @@ import ChatBox from "../Chatbox/ChatBox";
 import UserProfile from "../UserProfile/UserProfile";
 import Sidebar from "../Navigation/SideBar";
 import NavDrawer from "../Navigation/NavDrawer";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Chats from "../Conversation/Conversation";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import Settings from "../UserProfile/Settings";
 
 function Dashboard() {
   const theme = useTheme();
-  const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { selectedRecipientId } = useSelector((state) => state.globalVar);
   const location = useLocation();
@@ -18,23 +17,11 @@ function Dashboard() {
   const query = new URLSearchParams(location.search);
   const conversationId = query.get("conversationId");
 
-  const isUserProfileRoute = location.pathname.includes("user");
-
-  useEffect(() => {
-    if (location.pathname.includes("chat") && !isUserProfileRoute) {
-      if (!conversationId || conversationId !== selectedRecipientId) {
-        navigate("/dashboard/chat");
-      }
-    }
-  }, [
-    location.pathname,
-    conversationId,
-    selectedRecipientId,
-    isUserProfileRoute,
-    navigate,
-  ]);
-
+  const isUserProfileRoute = location.pathname == "/dashboard/chat/user";
+  const isSettingsRoute = location.pathname === "/dashboard/chat/settings";
   const isChatRoute = conversationId && conversationId === selectedRecipientId;
+
+
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
@@ -50,6 +37,8 @@ function Dashboard() {
                 <ChatBox />
               ) : isUserProfileRoute ? (
                 <UserProfile />
+              ) : isSettingsRoute ? (
+                <Settings />
               ) : (
                 <div className="flex h-full w-full items-center justify-center max-sm:hidden">
                   <Typography variant="body1">

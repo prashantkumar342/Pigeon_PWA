@@ -34,6 +34,7 @@ import { useSocket } from "../../socket/socket";
 import ListLoader from "../Loaders/ListLoader";
 import { useNavigate } from "react-router-dom";
 import CustomContextMenu from "../Menus/ContextMenu";
+import DataLoader from "../Loaders/DataLoader";
 
 function ConversationList() {
   const dispatch = useDispatch();
@@ -43,6 +44,7 @@ function ConversationList() {
     (state) => state.conversation
   );
   const { conversations } = useSelector((state) => state.globalVar);
+  const { recipientLoading } = useSelector((state) => state.recipient)
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredConversations, setFilteredConversations] = useState([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -63,10 +65,10 @@ function ConversationList() {
     const touch = event.touches[0];
     setTimeout(() => {
       setMenuPosition({ x: touch.clientX, y: touch.clientY });
-       setContextOptions([
-         { label: "this feature", onClick: () => null },
-         { label: "comming soon", onClick: () => null },
-       ]);
+      setContextOptions([
+        { label: "this feature", onClick: () => null },
+        { label: "comming soon", onClick: () => null },
+      ]);
     }, 500);
   };
   const handleClose = () => {
@@ -195,7 +197,7 @@ function ConversationList() {
         <TextField
           variant="outlined"
           placeholder="Search Chats"
-          size="small"
+          size="medium"
           fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -224,10 +226,8 @@ function ConversationList() {
           <ListLoader />
         ) : (
           <List>
-            {" "}
             {filteredConversations.map((convo, index) => (
               <div key={convo._id}>
-                {" "}
                 <ListItem
                   component={Button}
                   sx={{
@@ -237,6 +237,7 @@ function ConversationList() {
                     borderRadius: "0px",
                     marginBottom: "0px",
                     position: "relative",
+                    paddingY: 2,
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -245,25 +246,24 @@ function ConversationList() {
                   onContextMenu={handleContextMenu}
                   onTouchStart={handleTouchStart}
                 >
-                  {" "}
+
                   <ListItemAvatar
                     onClick={(e) => {
                       e.stopPropagation();
                       getRecipient(convo.user._id);
                     }}
                   >
-                    {" "}
                     <Avatar
                       src={convo.user.avatar}
                       sx={{ boxShadow: "0 3px 5px 2px rgba(0, 0, 0, .3)" }}
-                    />{" "}
-                  </ListItemAvatar>{" "}
+                    />
+                  </ListItemAvatar>
                   <ListItemText
                     primary={convo.user.username}
                     secondary={
                       convo.lastMessage?.type === "image" ? (
                         <span>
-                          {" "}
+
                           <ImageIcon
                             style={{
                               verticalAlign: "middle",
@@ -271,12 +271,12 @@ function ConversationList() {
                               fontSize: "16px",
                               color: "gray",
                             }}
-                          />{" "}
-                          photo{" "}
+                          />
+                          photo
                         </span>
                       ) : convo.lastMessage?.type === "video" ? (
                         <span>
-                          {" "}
+
                           <VideoLibraryIcon
                             style={{
                               verticalAlign: "middle",
@@ -284,11 +284,11 @@ function ConversationList() {
                               fontSize: "16px",
                               color: "gray",
                             }}
-                          />{" "}
-                          video{" "}
+                          />
+                          video
                         </span>
                       ) : (
-                        convo.lastMessage?.content
+                        convo.lastMessage?.content.length > 9 ? convo.lastMessage?.content.slice(0, 10) + ' ...' : convo.lastMessage?.content.slice(0, 10)
                       )
                     }
                     sx={{
@@ -298,11 +298,11 @@ function ConversationList() {
                       },
                       "& .MuiListItemText-secondary": { color: "black" },
                     }}
-                  />{" "}
-                </ListItem>{" "}
-                {index < filteredConversations.length - 1 && <Divider />}{" "}
+                  />
+                </ListItem>
+                {index < filteredConversations.length - 1 && <Divider />}
               </div>
-            ))}{" "}
+            ))}
           </List>
         )}
         <CustomContextMenu
@@ -311,6 +311,9 @@ function ConversationList() {
           onClose={handleClose}
         />
       </div>
+      {
+        recipientLoading && <DataLoader />
+      }
     </div>
   );
 }

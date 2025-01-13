@@ -9,13 +9,15 @@ import { authenticateUser } from "./redux/slices/api/authenticateSlice";
 import { useEffect, useState } from "react";
 import ScreenLoader from "./components/Loaders/ScreenLoader";
 import SplashScreen from "./splashScreen/SplashScreen";
+// import MyProfile from "./components/UserProfile/MyProfile";
+import Settings from "./components/UserProfile/Settings";
 
 function App() {
   const dispatch = useDispatch();
   const { authLoading } = useSelector((state) => state.authenticateUser);
   const { isLoggedIn } = useSelector((state) => state.user);
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   useEffect(() => {
     dispatch(authenticateUser());
   }, [dispatch]);
@@ -32,8 +34,9 @@ function App() {
 
   return (
     <div>
-      {!isLoaded && <SplashScreen />}
+      {!isLoaded && <SplashScreen />}{" "}
       <Routes>
+        {" "}
         <Route
           path="/"
           element={
@@ -45,7 +48,7 @@ function App() {
               <Form />
             )
           }
-        />
+        />{" "}
         <Route
           path="/dashboard"
           element={
@@ -58,17 +61,20 @@ function App() {
             )
           }
         >
+          {" "}
           <Route path="chat" element={<Chats />}>
+            {" "}
             <Route path="user" element={<UserProfile />} />
-            <Route path="*" element={<Navigate to="/dashboard/chat" />} />
-          </Route>
-        </Route>
+            <Route path="settings" element={<Settings />} />{" "}
+            {/* <Route path="*" element={<Navigate to="/dashboard/chat/settings" />} />{" "} */}
+          </Route>{" "}
+        </Route>{" "}
         <Route
           path="*"
           element={
             isLoggedIn ? <Navigate to="/dashboard/chat" /> : <Navigate to="/" />
           }
-        />
+        />{" "}
       </Routes>
     </div>
   );

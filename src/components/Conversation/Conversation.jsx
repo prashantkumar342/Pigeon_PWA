@@ -1,5 +1,9 @@
 import { useState } from "react";
 import {
+  Checkbox,
+  DialogContent,
+  DialogContentText,
+  FormControlLabel,
   IconButton,
   Tab,
   Typography,
@@ -19,25 +23,68 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ConversationList from "./ConversationList";
 import { Message } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { authenticateUser } from "../../redux/slices/api/authenticateSlice";
+import { setLoggedIn, setUserData } from "../../redux/slices/global/userSlice";
+import { logoutUser } from "../../redux/slices/api/logoutSlice";
+import CustomPrompt from "../Prompt/CustomPrompt";
 
 function Chats() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [tabValue, setTabValue] = useState("1");
+  const [clearData, setClearData] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState(false);
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
+  const handleCheckboxChange = (event) => {
+    setClearData(event.target.checked);
+  };
+
+  const clearWebsiteData = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+  };
+
+  const logout = () => {
+    dispatch(logoutUser()).then((response) => {
+      const status = response.payload;
+      if (status === 200) {
+        if (clearData) {
+          clearWebsiteData();
+        }
+        dispatch(authenticateUser());
+        dispatch(setUserData(null));
+        dispatch(setLoggedIn(false));
+        navigate("/");
+      }
+    });
+  };
   const moreOptions = [
-    "comming soon"
+    {
+      label: "Settings",
+      action: () => {
+        navigate('/dashboard/chat/settings');
+      }
+    },
+    {
+      label: "Logout",
+      action: () => {
+        setCustomPrompt(true)
+      },
+    },
+
   ]
 
   return (
     <div className="flex flex-col h-screen max-sm:w-screen overflow-hidden border-gray border-r-2">
       <TabContext value={tabValue}>
         <div className="flex flex-col h-full">
-          <div className="flex flex-row items-center pl-2  bg-white">
+          <div className="flex flex-row items-center pl-2 ">
             <div className="mr-auto ml-2 my-2">
               <Typography
                 variant="h4"
@@ -47,7 +94,7 @@ function Chats() {
                 Pigeon
               </Typography>
             </div>
-            <div className="ml-auto p-1">
+            <div className="ml-auto flex flex-row p-1">
               {isSmallScreen ? (
                 <IconButton
                   onClick={() => dispatch(setIsDrawer(true))}
@@ -163,6 +210,40 @@ function Chats() {
           </div>
         </div>
       </TabContext>
+      {customPrompt && (
+        <CustomPrompt
+          option1="Cancel"
+          action1={() => setCustomPrompt(false)}
+          action2={() => {
+            logout();
+            setCustomPrompt(false);
+          }}
+          option2="Logout"
+          dialogTitle="Are you sure you want to logout?"
+          open={() => {
+            setCustomPrompt(true);
+          }}
+          onClose={() => {
+            setCustomPrompt(false);
+          }}
+          dialogContent={
+            <DialogContent>
+              <DialogContentText id="dialog-description">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={clearData}
+                      onChange={handleCheckboxChange}
+                      color="primary"
+                    />
+                  }
+                  label="Clear data also"
+                />
+              </DialogContentText>
+            </DialogContent>
+          }
+        />
+      )}
     </div>
   );
 }

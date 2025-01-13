@@ -100,7 +100,7 @@ function Peoples() {
         <TextField
           variant="outlined"
           placeholder="Find Peoples"
-          size="small"
+          size="medium"
           fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -146,6 +146,7 @@ function Peoples() {
                     borderRadius: "0px",
                     margin: "0px",
                     position: "relative",
+                    paddingY: 2,
                   }}
                   onClick={() => {
                     getRecipient(user._id);
@@ -161,7 +162,7 @@ function Peoples() {
                     />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={user.username}
+                    primary={`${user.username.length > 9 ? user.username.slice(0, 10) + ' ...' : user.username}`}
                     secondary={`${user.email.slice(0, 10)}...`}
                     sx={{
                       "& .MuiListItemText-primary": {
