@@ -43,7 +43,8 @@ function ConversationList() {
   const { status: conversationStatus } = useSelector(
     (state) => state.conversation
   );
-  const { conversations } = useSelector((state) => state.globalVar);
+  const { conversations = [] } = useSelector((state) => state.globalVar);
+
   const { recipientLoading } = useSelector((state) => state.recipient)
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredConversations, setFilteredConversations] = useState([]);
@@ -86,24 +87,27 @@ function ConversationList() {
     };
   }, [menuPosition]);
 
+
   useEffect(() => {
     dispatch(fetchConversation()).then((response) => {
-      const conversationData = response.payload;
+      const conversationData = response.payload || [];
       dispatch(setConversations(conversationData));
       setFilteredConversations(conversationData);
     });
   }, [dispatch]);
 
+
   useEffect(() => {
     if (searchQuery) {
-      const result = conversations.filter((convo) =>
-        convo.user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      const result = (conversations || []).filter((convo) =>
+        convo.user?.username?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredConversations(result);
     } else {
-      setFilteredConversations(conversations);
+      setFilteredConversations(conversations || []);
     }
   }, [searchQuery, conversations]);
+
 
   useEffect(() => {
     if (socket) {
@@ -226,7 +230,8 @@ function ConversationList() {
           <ListLoader />
         ) : (
           <List>
-            {filteredConversations.map((convo, index) => (
+            {(filteredConversations || []).map((convo, index) => (
+
               <div key={convo._id}>
                 <ListItem
                   component={Button}

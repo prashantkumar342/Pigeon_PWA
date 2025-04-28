@@ -5,7 +5,7 @@ export const fetchRequests = createAsyncThunk(
   "users/fetchRequests",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(import.meta.env.VITE_FETCH_REQUEST, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/fetch/requests`, {
         headers: {
           "Content-Type": "application/json",
         },

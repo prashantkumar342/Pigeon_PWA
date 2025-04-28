@@ -6,14 +6,14 @@ export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
   async (searchQuery, { rejectWithValue }) => {
     try {
-      const response = await axios.get(import.meta.env.VITE_FETCH_USERS, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/fetch/users`, {
         headers: {
           "Content-Type": "application/json",
         },
         withCredentials: true,
-        params: { search: searchQuery }, 
+        params: { search: searchQuery },
       });
-      return response.data; 
+      return response.data;
     } catch (error) {
       if (error.response) {
         return rejectWithValue(error.response.data);

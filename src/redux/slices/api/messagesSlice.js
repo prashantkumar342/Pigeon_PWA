@@ -15,7 +15,7 @@ export const fetchMessages = createAsyncThunk(
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_FETCH_MESSAGES}/${recipientId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/chat/${recipientId}`,
         {
           withCredentials: true,
         }

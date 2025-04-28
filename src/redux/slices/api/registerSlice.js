@@ -29,7 +29,7 @@ export const registerUser = createAsyncThunk(
 
       // Register user with the avatar URL
       const response = await axios.post(
-        import.meta.env.VITE_REG_USER,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/register`,
         {
           username,
           email,
@@ -38,7 +38,7 @@ export const registerUser = createAsyncThunk(
         },
         { withCredentials: true }
       );
-      return  response.status;
+      return response.status;
     } catch (error) {
       return rejectWithValue(error.response?.status ?? "Unknown error");
     }

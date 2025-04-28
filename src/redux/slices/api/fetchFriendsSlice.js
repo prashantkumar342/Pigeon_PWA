@@ -5,7 +5,7 @@ export const fetchFriends = createAsyncThunk(
   "users/fetchFriends",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(import.meta.env.VITE_FETCH_FRIENDS, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/fetch/friends`, {
         headers: {
           "Content-Type": "application/json",
         },

@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
 import CancelIcon from "@mui/icons-material/Cancel";
 import DoneIcon from "@mui/icons-material/Done";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +22,6 @@ import {
 } from "../../redux/slices/global/globalSlice";
 import MoreOptions from "../Menus/MoreOptions";
 // import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { primaryColor } from "../../styles/Var";
 import { fetchMessages } from "../../redux/slices/api/messagesSlice";
 import { setUserData } from "../../redux/slices/global/userSlice";
 import { useEffect, useState } from "react";
@@ -69,84 +69,27 @@ function UserProfile() {
     });
   };
   const moreOptions = [
-    userData?.friends?.includes(selectedRecipientId) ? (
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={<CancelIcon />}
-        fullWidth
-        disableElevation
-        onClick={(e) => {
-          e.stopPropagation();
-          setCustomPrompt(true);
-        }}
-        sx={{
-          marginLeft: "auto",
-          textTransform: "none",
-          backgroundColor: "#FA4032",
-        }}
-      >
-        unfriend
-      </Button>
-    ) : userData?.pendingRequests?.includes(selectedRecipientId) ? (
-      <Button
-        variant="contained"
-        size="small"
-        fullWidth
-        disableElevation
-        onClick={(e) => {
-          e.stopPropagation();
-          // sendRequest(selectedRecipientId, userData._id);
-        }}
-        sx={{
-          marginLeft: "auto",
-          textTransform: "none",
-          backgroundColor: "gray",
-        }}
-      >
-        pending...
-      </Button>
-    ) : userData?.friendRequests?.includes(selectedRecipientId) ? (
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        fullWidth
-        startIcon={<DoneIcon />}
-        disableElevation
-        onClick={(e) => {
-          e.stopPropagation();
-          acceptRequestFromUsers(selectedRecipientId);
-        }}
-        sx={{
-          marginLeft: "auto",
-          textTransform: "none",
-          backgroundColor: "sky",
-        }}
-      >
-        Accept
-      </Button>
-    ) : (
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        fullWidth
-        startIcon={<PersonAddIcon />}
-        disableElevation
-        onClick={(e) => {
-          e.stopPropagation();
-          sendRequest(selectedRecipientId, userData._id);
-        }}
-        sx={{
-          marginLeft: "auto",
-          textTransform: "none",
-          backgroundColor: primaryColor,
-        }}
-      >
-        Add
-      </Button>
-    ),
+    userData?.friends?.includes(selectedRecipientId)
+      ? {
+        label: <Typography className=" w-full text-center justify-center flex gap-1"><CancelIcon />Remove</Typography>,
+        action: () => setCustomPrompt(true),
+      }
+      : userData?.pendingRequests?.includes(selectedRecipientId)
+        ? {
+          label: <Typography className=" w-full text-center justify-center flex gap-1"><HistoryToggleOffIcon />Requested</Typography>,
+          action: () => {
+            console.log("Already Pending Request");
+          },
+        }
+        : userData?.friendRequests?.includes(selectedRecipientId)
+          ? {
+            label: <Typography className=" w-full text-center justify-center flex gap-1"><DoneIcon />Accept</Typography>,
+            action: () => acceptRequestFromUsers(selectedRecipientId),
+          }
+          : {
+            label: <Typography className=" w-full text-center justify-center flex gap-1"><PersonAddIcon />Add Friend</Typography>,
+            action: () => sendRequest(selectedRecipientId, userData._id),
+          },
   ];
 
   useEffect(() => {
@@ -211,6 +154,7 @@ function UserProfile() {
           secondary={chatBoxData?.status}
         />
         <MoreOptions options={moreOptions} />
+
       </ListItem>
       <Box p={4} textAlign="center">
         <Avatar
@@ -260,16 +204,14 @@ function UserProfile() {
             removeFriend(selectedRecipientId, userData._id);
             setCustomPrompt(false);
           }}
-          open={() => {
-            setCustomPrompt(true);
-          }}
-          onClose={() => {
-            setCustomPrompt(false);
-          }}
-          option2="unfriend"
-          dialogTitle="sure, want to Unfriend?"
+          dialogContent={null}
+          open={customPrompt}
+          onClose={() => setCustomPrompt(false)}
+          option2="Unfriend"
+          dialogTitle="Sure, want to Unfriend?"
         />
       )}
+
     </div>
   );
 }

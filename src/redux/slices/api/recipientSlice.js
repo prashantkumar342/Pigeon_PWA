@@ -7,7 +7,7 @@ export const fetchRecipient = createAsyncThunk(
   async (recipientId, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        import.meta.env.VITE_FETCH_RECIPIENT,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/fetch/recipient`,
         { recipient: recipientId },
         {
           headers: {

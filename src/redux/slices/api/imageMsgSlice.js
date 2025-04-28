@@ -6,7 +6,7 @@ import imageCompression from "browser-image-compression";
 export const imageMessage = createAsyncThunk(
   "imageMessage",
   async (userCreds, { rejectWithValue }) => {
-    const {  avatar } = userCreds;
+    const { avatar } = userCreds;
     try {
       let avatarUrl = "";
       if (avatar) {
@@ -29,9 +29,9 @@ export const imageMessage = createAsyncThunk(
 
       // Register user with the avatar URL
       const response = await axios.post(
-        import.meta.env.VITE_REG_USER,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/register`,
         {
-          type:'image',
+          type: 'image',
           avatar: avatarUrl,
         },
         { withCredentials: true }

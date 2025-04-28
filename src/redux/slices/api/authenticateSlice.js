@@ -8,7 +8,7 @@ export const authenticateUser = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const response = await axios.post(
-        import.meta.env.VITE_AUTHENTICATIE,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/authenticate/account`,
         {},
         { withCredentials: true }
       );

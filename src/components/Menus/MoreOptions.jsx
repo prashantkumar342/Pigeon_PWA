@@ -1,15 +1,15 @@
 import * as React from "react";
+import PropTypes from "prop-types";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import PropTypes from "prop-types";
-import { Divider } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 
 export default function MoreOptions({ options }) {
-  const [anchorEl, setAnchorEl] = React.useState(null); // Fix default state
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -32,14 +32,15 @@ export default function MoreOptions({ options }) {
       >
         <MoreVertIcon />
       </IconButton>
+
       <Menu
         id="long-menu"
-        MenuListProps={{
-          "aria-labelledby": "long-button",
-        }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "long-button",
+        }}
         PaperProps={{
           style: {
             maxHeight: ITEM_HEIGHT * 4.5,
@@ -47,20 +48,20 @@ export default function MoreOptions({ options }) {
           },
         }}
       >
-        {options.map((option, index) => (
-          <>
-            <MenuItem
-              key={option.label}
-              onClick={() => {
-                handleClose();
-                option.action();
-              }}
-            >
-              {option.label}
-            </MenuItem>
-            {index < options.length - 1 && <Divider />}
-          </>))}
-
+        {options.flatMap(({ label, action }, index) => [
+          <MenuItem
+            key={`menu-item-${index}`}
+            onClick={() => {
+              handleClose();
+              action();
+            }}
+          >
+            {label}
+          </MenuItem>,
+          index < options.length - 1 && (
+            <Divider key={`divider-${index}`} />
+          ),
+        ])}
       </Menu>
     </div>
   );

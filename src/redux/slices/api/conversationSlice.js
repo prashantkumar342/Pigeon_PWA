@@ -6,7 +6,7 @@ export const fetchConversation = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        import.meta.env.VITE_FETCH_CONVERSATION,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/fetch/conversations`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -6,7 +6,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        import.meta.env.VITE_LOGOUT_USER,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/logout`,
         {},
         {
           headers: {

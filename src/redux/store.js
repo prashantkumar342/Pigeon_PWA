@@ -13,11 +13,12 @@ import messagesReducer from "./slices/api/messagesSlice";
 import fetchRequestsReducer from "./slices/api/fetchRequestSlice";
 import fetchFriendsReducer from "./slices/api/fetchFriendsSlice";
 import { combineReducers } from "redux";
+import messagesStoreSlice from "./slices/global/messagesStoreSlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "globalVar", "messages", "conversation", "recipient"],
+  whitelist: ["user", "globalVar", "messages", "conversation", "recipient", "messagesStore"],
 };
 
 const rootReducer = combineReducers({
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   recipient: recipientReducer,
   conversation: conversationReducer,
   messages: messagesReducer,
+  messagesStore: messagesStoreSlice,
   requests: fetchRequestsReducer,
   friends: fetchFriendsReducer,
 });
